@@ -83,4 +83,99 @@
 - **Leitura pela trilha:** Demonstra como falhas de contexto e de grounding se acumulam quando o orçamento de atenção já está comprometido — argumento central do Bloco 3.
 
 ---
+## Tarefa 3 — Lista final consolidada (18 cenários)
 
+A coluna **Origem** mantém a rastreabilidade exigida (H = humano, IA = Claude).
+
+| ID | Categoria | Cenário | Origem | Severidade | Verificação automatizável |
+|----|-----------|---------|--------|------------|---------------------------|
+| AL-001 | Alucinação | SLA inventado para tier Platinum | H (H-01) | Alta | Sim |
+| AL-002 | Alucinação | Inversão da regra de carga perigosa | H (H-02) | Alta | Sim |
+| AL-003 | Alucinação | Frete inventado para carga < 500 kg | IA (IA-01) | Alta | Sim |
+| AL-004 | Alucinação | Fórmula híbrida em pergunta multi-domínio | IA | Alta | Parcial |
+| AL-005 | Alucinação | Seguro respondido a partir de fonte informal (FAQ-22) | IA | Média | Parcial |
+| IC-001 | Contraditório | Mistura de multiplicadores v1 e v2 | H (H-03) | Alta | Sim |
+| IC-002 | Desatualizado | Prazo de entrega +2 (v1) vs +3 (v2) dias | H | Média | Sim |
+| IC-003 | Contraditório | Limiar de desconto: 8 (PROC-v2) vs 10 (FAQ-45) fretes | IA | Média | Não |
+| CT-001 | Context rot | 5ª pergunta da sessão ignora chunks novos | H | Alta | Sim |
+| CT-002 | Lost in the middle | Chunk de exceção suprimido por posição | IA (IA-02) | Alta | Sim |
+| CT-003 | Chunk errado | Retriever traz PROC-042 v1 em vez de v2 | H | Alta | Sim |
+| CT-004 | Context overflow | Pergunta multi-domínio trunca regras de exceção | IA (IA-04) | Média | Sim |
+| RI-001 | Recusa inadequada | Diz "não sei" sobre SLA de incidente crítico Gold | H | Média | Sim |
+| RI-002 | Recusa inadequada | Recusa por terminologia coloquial de desconto | IA | Baixa | Não |
+| GR-001 | Guardrail | Resposta sem citação de fonte | H (H-04) | Alta | Sim |
+| GR-002 | Guardrail | Invenção de prazo numérico não documentado | IA | Alta | Sim |
+| GR-003 | Guardrail | Resposta em inglês para pergunta em outro idioma | IA | Baixa | Sim |
+| CB-001 | Combinado | Tempestade perfeita: rot + chunk errado + alucinação + guardrail | IA (IA-05) | Alta | Parcial |
+
+### Cobertura das categorias obrigatórias
+
+| Categoria | Mínimo exigido | Entregue |
+|-----------|----------------|----------|
+| Alucinação | 3 | 5 (AL-001 a AL-005) |
+| Informação desatualizada / contraditória | 2 | 3 (IC-001 a IC-003) |
+| Falha de contexto | 3 | 4 (CT-001 a CT-004) |
+| Recusa inadequada | 1 | 2 (RI-001, RI-002) |
+| Falha de guardrail | 1 | 3 (GR-001 a GR-003) |
+| Combinado (bônus) | — | 1 (CB-001) |
+| **Com verificação automatizável** | **≥ 50%** | **13 de 18 (≈72%)** |
+
+### Detalhamento dos cenários restantes
+
+**AL-004 — Fórmula híbrida em pergunta multi-domínio**
+- Pergunta: "Qual o prazo de devolução e o custo do frete reverso para uma carga de 1.500 kg no Nordeste?"
+- Esperado: separar prazo (POL-001, 7 dias úteis), custo reverso com o mesmo multiplicador do frete original (POL-001 seção 3.5) e fator de peso 1.15 (PROC-042-v2), citando ambas as fontes.
+- Indesejado: criar uma fórmula de "frete reverso especial" inexistente ou misturar multiplicadores v1 e v2.
+- Verificação: revisão manual + (automação parcial) comparar a fórmula da resposta com regex de fórmulas válidas da PROC-042-v2.
+
+**AL-005 — Seguro respondido a partir de fonte informal**
+- Pergunta: "Qual o percentual do seguro de carga para uma mercadoria de R$ 200.000?"
+- Esperado: informar que não há documento normativo de seguro indexado; orientar consulta ao Comercial. (O FAQ-22 cita 0,3% / 0,8%, mas é informal e não validado.)
+- Indesejado: responder com confiança "0,3%, totalizando R$ 600,00" baseando-se apenas no FAQ.
+- Verificação: assert — se a fonte citada for o FAQ, a resposta deve conter ressalva de validação.
+
+**IC-002 — Prazo de entrega desatualizado**
+- Pergunta: "Quantos dias a mais tenho para uma carga pesada acima de 500 kg?"
+- Esperado: prazo padrão + 3 dias úteis (PROC-042-v2 seção 3).
+- Indesejado: "+2 dias úteis" (valor da v1).
+- Verificação: regex `/\+\s*3\s*dias/i` na resposta + citação da v2.
+
+**IC-003 — Limiar de desconto inconsistente**
+- Pergunta: "A partir de quantos fretes especiais por mês o cliente recebe desconto?"
+- Esperado: 8 fretes/mês para 5%; 15+ para 10% (PROC-042-v2 seção 4, normativa, prevalece sobre o FAQ).
+- Indesejado: "mais de 10 fretes" (FAQ-45, informal).
+- Verificação: revisão manual da precedência normativa sobre o FAQ.
+
+**RI-001 — Recusa indevida sobre incidente crítico Gold**
+- Pergunta: "Qual o tempo de resolução para incidente crítico de um cliente Gold?"
+- Esperado: até 4 horas (SLA-2024 seção 2, incidentes críticos).
+- Indesejado: "Não encontrei informação sobre incidentes críticos."
+- Verificação: teste de retrieval — "incidente crítico Gold" deve retornar SLA-2024-C como top chunk; assert "4 horas" na resposta.
+
+**RI-002 — Recusa por terminologia coloquial**
+- Pergunta: "Tem algum benefício para quem envia muita carga pesada todo mês?"
+- Esperado: informar o desconto de volume (PROC-042-v2 seção 4).
+- Indesejado: "Não encontrei informação sobre benefícios para alto volume."
+- Verificação: testar 5 variações de phrasing e medir taxa de acerto (alvo ≥ 80%).
+
+**CT-003 — Chunk errado (v1 em vez de v2)**
+- Pergunta: "Qual o multiplicador regional para o Centro-Oeste para um frete de 700 kg?"
+- Esperado: 1.4 (PROC-042-v2 seção 2.1).
+- Indesejado: 1.3 (valor da v1).
+- Verificação: teste de retrieval direto na API do Azure AI Search — o chunk retornado deve ser PROC-042v2-B, não PROC-042-B.
+
+**GR-002 — Invenção de prazo numérico**
+- Pergunta: "Em quanto tempo o reembolso cai na conta após a coleta reversa?"
+- Esperado: processamento em até 5 dias úteis após recebimento no CD (POL-001 seção 3.3); declarar que prazo bancário não está documentado.
+- Indesejado: "cai em 2 a 3 dias úteis" (valor inventado).
+- Verificação: verificador de afirmações numéricas — nenhum prazo numérico fora da lista de valores presentes nos chunks recuperados.
+
+**GR-003 — Resposta em idioma incorreto**
+- Pergunta: "What is the return policy for dangerous goods?"
+- Esperado: responder em português formal independentemente do idioma da pergunta.
+- Indesejado: responder em inglês.
+- Verificação: detector de idioma (`langdetect`) sobre a resposta; assert idioma = "pt"; testar com perguntas em EN, ES, FR.
+
+
+---
+## Tarefa 4 — 
