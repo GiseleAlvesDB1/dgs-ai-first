@@ -6,7 +6,7 @@
 **Blocos cobertos no Cenário 1:** 1) Fundamentos de IA Generativa · 2) Engenharia de Prompt · 3) Engenharia de Contexto · 4) RAG e MCP
 **Projeto-base:** Assistente de IA conversacional da NovaTech (logística — Teams + SharePoint + Azure AI Services)
 **Prazo do Cenário 1:** 06/06
-
+---
 # Resposta - Exercício 1.1 — Identificação de cenários de falha de IA
 ---
 ## Tarefa 1 — Lista inicial com 4 cenários de falha (sem usar IA).
@@ -120,7 +120,8 @@ A coluna **Origem** mantém a rastreabilidade exigida (H = humano, IA = Claude).
 | Combinado (bônus) | — | 1 (CB-001) |
 | **Com verificação automatizável** | **≥ 50%** | **13 de 18 (≈72%)** |
 
-### Detalhamento dos cenários restantes
+---
+## Tarefa 4 — Detalhamento dos cenários restantes
 
 **AL-004 — Fórmula híbrida em pergunta multi-domínio**
 - Pergunta: "Qual o prazo de devolução e o custo do frete reverso para uma carga de 1.500 kg no Nordeste?"
@@ -158,17 +159,11 @@ A coluna **Origem** mantém a rastreabilidade exigida (H = humano, IA = Claude).
 - Indesejado: "Não encontrei informação sobre benefícios para alto volume."
 - Verificação: testar 5 variações de phrasing e medir taxa de acerto (alvo ≥ 80%).
 
-**CT-003 — Chunk errado (v1 em vez de v2)**
-- Pergunta: "Qual o multiplicador regional para o Centro-Oeste para um frete de 700 kg?"
-- Esperado: 1.4 (PROC-042-v2 seção 2.1).
-- Indesejado: 1.3 (valor da v1).
-- Verificação: teste de retrieval direto na API do Azure AI Search — o chunk retornado deve ser PROC-042v2-B, não PROC-042-B.
-
 **GR-002 — Invenção de prazo numérico**
-- Pergunta: "Em quanto tempo o reembolso cai na conta após a coleta reversa?"
-- Esperado: processamento em até 5 dias úteis após recebimento no CD (POL-001 seção 3.3); declarar que prazo bancário não está documentado.
-- Indesejado: "cai em 2 a 3 dias úteis" (valor inventado).
-- Verificação: verificador de afirmações numéricas — nenhum prazo numérico fora da lista de valores presentes nos chunks recuperados.
+- **Pergunta:** "Em quanto tempo o reembolso cai na conta após a coleta reversa?"
+- **Esperado:** Processamento em até 5 dias úteis após recebimento no CD (POL-001 seção 3.3); declarar que prazo bancário não está documentado.
+- **Indesejado:** "Cai em 2 a 3 dias úteis" (valor inventado).
+- **Verificação:** Verificador de afirmações numéricas — nenhum prazo numérico fora da lista de valores presentes nos chunks recuperados. ✅ Automatizável
 
 **GR-003 — Resposta em idioma incorreto**
 - Pergunta: "What is the return policy for dangerous goods?"
@@ -176,6 +171,216 @@ A coluna **Origem** mantém a rastreabilidade exigida (H = humano, IA = Claude).
 - Indesejado: responder em inglês.
 - Verificação: detector de idioma (`langdetect`) sobre a resposta; assert idioma = "pt"; testar com perguntas em EN, ES, FR.
 
+**CT-003 — Chunk errado (v1 em vez de v2)**
+- **Pergunta:** "Qual o multiplicador regional para o Centro-Oeste para um frete de 700 kg?"
+- **Esperado:** 1.4 (PROC-042-v2 seção 2.1).
+- **Indesejado:** 1.3 (valor da v1).
+- **Verificação:** Teste de retrieval direto na API do Azure AI Search — o chunk retornado deve ser PROC-042v2-B, não PROC-042-B. ✅ Automatizável
+
+**CB-001 — Tempestade perfeita**
+- **Pergunta:** 8ª troca da sessão: "Qual o custo total para um cliente Platinum devolver uma carga perigosa de 4.000 kg do Nordeste?"
+- **Esperado:** (1) Platinum não existe — SLA-2024 seção 1; (2) carga perigosa não segue processo padrão — POL-001 seção 3.2; (3) acima de 3.000 kg fator 1.4 + Nordeste 1.5 — PROC-042-v2. Cada afirmação com fonte.
+- **Indesejado:** Custo total inventado com tier Platinum, multiplicadores da v1 e devolução autorizada, sem alertas ou fontes.
+- **Verificação:** Script de 7 trocas + pergunta-bomba; revisão por par (QA + especialista de domínio); validar cada afirmação contra os documentos. ⚠️ Parcialmente automatizável
+
+
+# Resposta - Exercício 1.2 — Design de critérios de aceitação para respostas de IA
+---
+
+## Tarefa 1 — Avalie cada resposta por conta própria primeiro: está correta, parcialmente correta ou incorreta? Justifique com base nos documentos do **Anexo A**.
+Avaliação com os documentos do Anexo A como fonte de verdade.
+
+### Resposta 1 — "Qual o prazo de devolução?"
+- **Resposta avaliada:** "O prazo é de 7 dias úteis, exceto para cargas perigosas classes 1 a 6 da ANTT." — Fonte: POL-001, seção 3.2.
+- **Veredicto:** **Parcialmente correta.**
+- **Justificativa:** O prazo de 7 dias úteis está correto (seção 3.1) e a menção à exceção de carga perigosa também (seção 3.2). Problemas: (a) a citação aponta só a seção 3.2, mas o prazo geral vem da 3.1 — fonte parcialmente incorreta; (b) omite as outras duas exceções da seção 3.2 (cadeia de frio rompida e lacre violado), comprometendo a completude.
+
+### Resposta 2 — "Quanto custa frete para 600 kg para Manaus?"
+- **Resposta avaliada:** "O frete especial para cargas acima de 500 kg para a região Norte tem multiplicador de 1.8 sobre o valor base." — Fonte: PROC-042-v2, seção 2.
+- **Veredicto:** **Parcialmente correta.**
+- **Justificativa:** O multiplicador 1.8 para o Norte está correto na versão vigente (PROC-042-v2 seção 2.1), e Manaus é Norte. Porém não menciona o fator de peso: para 600 kg (faixa 500–1.000 kg) o fator é 1.0 — não altera o valor, mas a fórmula completa deveria ser explicitada para não induzir a erro em outras faixas. Citação ideal: seção 2.1.
+
+### Resposta 3 — "Qual o SLA do cliente Platinum?"
+- **Resposta avaliada:** "O cliente Platinum tem resposta em até 1h e resolução em até 12h." — Fonte: SLA-2024.
+- **Veredicto:** **INCORRETA (alucinação pura).**
+- **Justificativa:** O tier Platinum **não existe**. A SLA-2024 seção 1 declara explicitamente que não há outros tiers além de Gold, Silver e Standard. O assistente alucinou tier e valores (1h / 12h não correspondem a nenhum tier real) e citou uma fonte que contradiz a própria resposta. Pela leitura do Bloco 1: texto estatisticamente plausível sem *grounding* — o pior tipo de falha, porque vem com confiança e citação falsa.
+
+### Resposta 4 — "Posso devolver carga perigosa?"
+- **Resposta avaliada:** "Sim, cargas perigosas podem ser devolvidas em até 7 dias úteis." — Fonte: POL-001, seção 3.2.
+- **Veredicto:** **INCORRETA (inversão de regra).**
+- **Justificativa:** O POL-001 seção 3.2 afirma o oposto: cargas perigosas (classes 1 a 6 da ANTT) **NÃO são elegíveis** ao processo padrão. O correto seria orientar contato com a Gestão de Riscos (ramal 4500). A citação aponta a seção certa, mas inverte o conteúdo — risco regulatório.
+
+### Resposta 5 — "Qual o multiplicador de frete para o Sudeste?"
+- **Resposta avaliada:** "O multiplicador regional para o Sudeste é 1.1." — Fonte: PROC-042-v2, seção 2.
+- **Veredicto:** **Correta.**
+- **Justificativa:** 1.1 é o multiplicador do Sudeste na versão vigente (PROC-042-v2 seção 2.1). Reparo menor: a citação ideal seria seção 2.1, e poderia ressalvar que chamados em transição (anteriores a 01/12/2023) ainda usam a v1 (Sudeste 1.0).
+
+### Resumo da avaliação manual
+
+| # | Veredicto | Problema principal |
+|---|-----------|--------------------|
+| 1 | Parcialmente correta | Fonte imprecisa + exceções incompletas |
+| 2 | Parcialmente correta | Fórmula incompleta (fator de peso omitido) |
+| 3 | **Incorreta** | Alucinação de tier e valores; fonte falsa |
+| 4 | **Incorreta** | Inversão da regra de carga perigosa |
+| 5 | Correta | Citação levemente imprecisa (seção) |
 
 ---
-## Tarefa 4 — 
+## Tarefa 2 — Rubrica de avaliação (4 dimensões, escala 1–3)
+
+A rubrica organiza as 4 dimensões dentro do framework **Produto / Processo / Performance** do bloco de Revisão Crítica de Outputs da trilha (10b): Produto (o output é preciso e completo?), Processo (o raciocínio e o *grounding* fazem sentido?), Performance (o estilo é adequado?). É objetiva o suficiente para que dois QAs cheguem a pontuações semelhantes.
+
+### Dimensão A — Precisão factual *(Produto)*
+| Nível | Descrição |
+|-------|-----------|
+| 3 | Todos os fatos, valores e regras conferem exatamente com a documentação normativa. |
+| 2 | O fato central está correto, mas há imprecisão secundária que não inverte o sentido. |
+| 1 | Erro factual relevante: valor inventado, regra invertida, tier/entidade inexistente ou contradição com a fonte. |
+
+### Dimensão B — Citação de fonte / grounding *(Processo)*
+| Nível | Descrição |
+|-------|-----------|
+| 3 | Cita documento + seção corretos, e a seção citada efetivamente contém a informação (grounding verificável). |
+| 2 | Cita o documento certo, mas a seção está imprecisa ou ausente; a informação ainda é localizável. |
+| 1 | Não cita fonte, cita documento errado, ou cita uma fonte que contradiz a própria resposta. |
+
+### Dimensão C — Aderência aos guardrails *(Processo)*
+| Nível | Descrição |
+|-------|-----------|
+| 3 | Não inventa prazos/valores; se a informação não existe, declara explicitamente; idioma é português formal. |
+| 2 | Cumpre os guardrails, mas com tom inadequado, uso de fonte informal sem ressalva, ou hesitação desnecessária. |
+| 1 | Inventa dados, afirma saber algo fora da base, ou responde em idioma/registro incorreto. |
+
+### Dimensão D — Completude e adequação *(Produto + Performance)*
+| Nível | Descrição |
+|-------|-----------|
+| 3 | Cobre a regra principal e todas as exceções/condições materialmente relevantes; tom adequado ao atendente. |
+| 2 | Cobre a regra principal, mas omite exceções/condições secundárias que poderiam afetar a decisão. |
+| 1 | Resposta parcial que omite informação essencial, podendo induzir o atendente a erro. |
+
+### Critério de aprovação (alinhado a Acceptance — Harness, Bloco 9)
+- **Aprovada:** total ≥ 10 **e** nenhuma dimensão com nota 1.
+- **Aprovada com ressalvas:** total entre 8 e 9, sem nota 1 em Precisão factual ou Aderência a guardrails.
+- **Reprovada:** total ≤ 7 **ou** qualquer nota 1 em Precisão factual ou Citação de fonte.
+
+---
+## Tarefa 3 — Template reutilizável (estrutura para o Claude Cowork)
+
+# Formulário de Avaliação de Respostas do Assistente — QA
+
+> Template reutilizável: o time de QA pode usar para avaliar **qualquer lote** de respostas do assistente.
+> Copie o bloco **"Ficha de avaliação"** abaixo uma vez para cada resposta avaliada.
+
+---
+
+## Como usar
+
+1. Para cada resposta, copie e preencha uma **Ficha de avaliação**.
+2. Registre a **Fonte citada** (o que a resposta alegou) e a **Fonte correta (gabarito)** conforme o Anexo A.
+3. Atribua uma nota **1–3** a cada dimensão (A–D), seguindo a rubrica.
+4. Calcule o **Total** (A + B + C + D) e o **Veredicto** pela regra abaixo.
+5. Use **Observações** para justificar a nota — base para feedback e agregação.
+
+As notas estruturadas (1–3 por dimensão) funcionam como *structured output*: tornam a avaliação verificável e agregável.
+
+---
+
+## Escala (1–3 por dimensão)
+
+`1` = inadequado · `2` = parcial · `3` = adequado
+
+### A — Precisão factual
+- **3** — Todas as afirmações estão corretas e alinhadas à fonte oficial.
+- **2** — Majoritariamente correta, com imprecisões menores que não comprometem a decisão.
+- **1** — Contém erro factual relevante ou informação inventada (alucinação).
+
+### B — Citação / grounding
+- **3** — Cita documento e seção corretos; a citação sustenta a afirmação.
+- **2** — Cita fonte correta, mas seção imprecisa, incompleta ou parcialmente sustentada.
+- **1** — Não cita fonte, cita fonte errada ou a citação não sustenta a resposta.
+
+### C — Aderência a guardrails
+- **3** — Respeita totalmente escopo, políticas e limites definidos.
+- **2** — Desvio leve de tom/escopo, sem violar política.
+- **1** — Viola guardrail: dá conselho fora de escopo, vaza dado sensível ou ignora restrição.
+
+### D — Completude / adequação
+- **3** — Responde integralmente à pergunta, no nível de detalhe adequado.
+- **2** — Responde parcialmente ou com detalhe insuficiente/excessivo.
+- **1** — Não responde à pergunta ou é irrelevante.
+
+---
+
+## Regra de veredicto
+
+- **Reprovação automática**: se **A = 1** OU **B = 1** → **Reprovada** (independente do total).
+- **Aprovada**: Total ≥ 10 (e sem reprovação automática).
+- **Com ressalvas**: Total entre 8 e 9.
+- **Reprovada**: Total < 8.
+
+> Total = A + B + C + D (mínimo **4**, máximo **12**).
+
+---
+
+## Ficha de avaliação
+
+> Copie este bloco uma vez para cada resposta avaliada.
+
+```
+ID:
+Pergunta:
+Resposta do assistente:
+Fonte citada:
+Fonte correta (gabarito):
+
+A — Precisão factual (1–3):
+B — Citação / grounding (1–3):
+C — Aderência a guardrails (1–3):
+D — Completude / adequação (1–3):
+
+Total (A+B+C+D):
+Veredicto (Aprovada / Com ressalvas / Reprovada):
+Observações:
+```
+
+---
+
+## Exemplo preenchido
+
+```
+ID: R-001
+Pergunta: Posso reembolsar uma passagem aérea comprada com cartão corporativo?
+Resposta do assistente: Sim. Conforme a Política de Despesas, passagens aéreas
+  são reembolsáveis mediante nota fiscal e aprovação do gestor.
+Fonte citada: Política de Despesas, Seção 4.2
+Fonte correta (gabarito): Política de Despesas, Seção 4.2
+
+A — Precisão factual (1–3): 3
+B — Citação / grounding (1–3): 3
+C — Aderência a guardrails (1–3): 3
+D — Completude / adequação (1–3): 2
+
+Total (A+B+C+D): 11
+Veredicto: Aprovada
+Observações: Resposta correta e bem fundamentada; faltou citar o prazo de envio
+  (completude parcial).
+```
+
+---
+
+## Resumo do lote
+
+Preencha após avaliar todas as respostas do lote.
+
+| Métrica | Valor |
+|---|---|
+| Respostas avaliadas | |
+| Aprovadas | |
+| Com ressalvas | |
+| Reprovadas | |
+| % Aprovação | |
+| Total médio | |
+| Média A — Precisão factual | |
+| Média B — Citação / grounding | |
+| Média C — Aderência a guardrails | |
+| Média D — Completude / adequação | |
