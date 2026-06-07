@@ -2,8 +2,12 @@
 
 # Cenário 1 — Entregáveis do papel de QA
 
-**Trilha de Certificação AI First — DB1 Global Software (DGS)**
-**Blocos cobertos no Cenário 1:** 1) Fundamentos de IA Generativa · 2) Engenharia de Prompt · 3) Engenharia de Contexto · 4) RAG e MCP
+**Trilha de Certificação AI First — DB1 Global Software (DGS)
+**Blocos cobertos no Cenário 1:
+** 1) Fundamentos de IA Generativa 
+** 2) Engenharia de Prompt
+** 3) Engenharia de Contexto
+** 4) RAG e MCP
 **Projeto-base:** Assistente de IA conversacional da NovaTech (logística — Teams + SharePoint + Azure AI Services)
 **Prazo do Cenário 1:** 06/06
 ---
@@ -183,7 +187,7 @@ A coluna **Origem** mantém a rastreabilidade exigida (H = humano, IA = Claude).
 - **Indesejado:** Custo total inventado com tier Platinum, multiplicadores da v1 e devolução autorizada, sem alertas ou fontes.
 - **Verificação:** Script de 7 trocas + pergunta-bomba; revisão por par (QA + especialista de domínio); validar cada afirmação contra os documentos. ⚠️ Parcialmente automatizável
 
-
+---
 # Resposta - Exercício 1.2 — Design de critérios de aceitação para respostas de IA
 ---
 
@@ -267,9 +271,6 @@ A rubrica organiza as 4 dimensões dentro do framework **Produto / Processo / Pe
 ## Tarefa 3 — Template reutilizável (estrutura para o Claude Cowork)
 
 # Formulário de Avaliação de Respostas do Assistente — QA
-
-> Template reutilizável: o time de QA pode usar para avaliar **qualquer lote** de respostas do assistente.
-> Copie o bloco **"Ficha de avaliação"** abaixo uma vez para cada resposta avaliada.
 
 ---
 
@@ -385,14 +386,9 @@ Preencha após avaliar todas as respostas do lote.
 | Média C — Aderência a guardrails | |
 | Média D — Completude / adequação | |
 
+
 ---
 ## Tarefa 4 — Avaliação de Respostas do Assistente (QA)
-
-> **Entregável consolidado.** Reúne os quatro artefatos do exercício: a avaliação manual (feita antes da rubrica), a rubrica gerada com o Claude, o template reutilizável do Cowork e as pontuações aplicadas às 5 respostas.
->
-> *Nota sobre o conteúdo:* o texto de Pergunta/Resposta/Fontes das 5 respostas foi reconstruído de forma coerente com os comentários e critérios fornecidos (domínio SLA-2024 / POL-001). As **notas, totais e veredictos** são exatamente os definidos na aplicação da rubrica; ajuste o fraseado das perguntas se divergir do material original.
-
----
 
 ## 1. Metodologia
 
@@ -895,7 +891,7 @@ Atualizar a cada rodada de testes. Sugestão: vincular no Cowork como visão con
 
 ---
 
-## 10. Cadência e papéis
+## Cadência e papéis
 
 - **Por deploy:** suíte de fumaça (E2E-02, E2E-04, E2E-05, E2E-06) antes de liberar aos atendentes.
 - **Por PR / mudança:** rodar golden set (REG-01) + camada afetada pelo gatilho (ver §8.2).
@@ -911,4 +907,3 @@ Atualizar a cada rodada de testes. Sugestão: vincular no Cowork como visão con
 - **Exercício 1.1:** lista inicial (4 cenários, origem humana) + cenários adicionais (origem Claude) + lista consolidada de 18 cenários, com coluna de origem e 13 verificações automatizáveis (acima do mínimo de 50%).
 - **Exercício 1.2:** avaliação manual prévia + rubrica de 4 dimensões ancorada em Produto/Processo/Performance + estrutura de template reutilizável + pontuações aplicadas, identificando corretamente as respostas 3 e 4 como incorretas.
 - **Exercício 1.3:** plano em 7 camadas (ingestão, retrieval, geração, contexto, MCP, E2E, regressão), testando cada etapa isoladamente e o fluxo integrado, com tratamento explícito do não-determinismo (temperatura) e da engenharia de contexto.
-- **Alinhamento à trilha:** o mapa de rastreabilidade no início do documento liga cada decisão de QA ao bloco correspondente da Trilha DGS AI First (Blocos 1 a 4, com pontes para os Blocos 9 e 10b).
