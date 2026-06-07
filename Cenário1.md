@@ -34,7 +34,7 @@
 - **Pergunta de teste:** "Qual o multiplicador para o Norte e para o Sudeste?"
 - **Comportamento esperado:** Usar somente a v2 para chamados a partir de 01/12/2023 (Norte 1.8, Sudeste 1.1), citando PROC-042-v2 seção 2.1 e a disposição transitória da seção 5.
 - **Comportamento indesejado:** Misturar valores das duas versões (ex.: Norte 1.6 da v1 e Sudeste 1.1 da v2) sem aviso de inconsistência.
-- **Como verificar: informação desatualizada e/ou contraditória, pode levar ao erro de valor financeiro direto.
+- **Como verificar: Teste paramétrico com fixture de data do chamado (antes/depois de 01/12/2023); assert dos valores por versão.
 
 ### Cenário-04 — Resposta sem citação de fonte (guardrail 1)
 - **Categoria:** Falha de guardrail
@@ -45,6 +45,12 @@
 
 ---
 ## Tarefa 2 — Cenários da expansão com IA (Claude), cobrindo ângulos menos óbvios — em especial falhas de engenharia de contexto (Bloco 3) e combinações.
+
+> Prompt utilizado:
+Atue como um Analista de Qualidade (QA) sênior com experiência em testes de software que está em treinamento da Trilha de Formação para Certificação AI First da DGS.
+Com base nos documentos anexados respondi a tarefa 1 do Exercicio 1.1 e preciso que expande a lista: fornecendo os cenários do projeto, os guardrails, e  que identifique cenários de falha adicionais. Gere ao menos mais 4 cenários que que não pensei:
+Obs: Adicionei os cenários que pensei, sem IA.
+
 
 ### IA-Cenário-01 — Invenção de frete para carga abaixo de 500 kg
 - **Categoria:** Alucinação (pergunta sem cobertura)
