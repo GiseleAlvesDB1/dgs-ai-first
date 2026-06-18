@@ -29,6 +29,18 @@
    - O que todo teste NÃO DEVE ter (acesso a serviços reais, dependência de ordem, assertions vagas).
    - Padrão de mocking (msw para HTTP, factories para dados).
    - Padrão de fixtures (dados reutilizáveis para testes de RAG — perguntas, chunks, respostas esperadas).
+  
+2. Reescreva o teste ruim seguindo seus padrões. Mostre antes/depois, explicando cada melhoria.
+
+3. Defina ao menos 3 critérios que um código de teste gerado por IA deve atender para passar no code review de QA.
+
+**Entregável:** A seção Testing Standards do AGENTS.md, o teste reescrito com explicações, e os critérios de review.
+
+**Critérios de avaliação:**
+- A seção é prescritiva o suficiente para que o Copilot gere testes melhores.
+- O teste reescrito demonstra os padrões na prática.
+- Os critérios de review são objetivos (dois QAs chegariam à mesma conclusão).
+  
 ---
 ### Testing Standards (QA)
 
