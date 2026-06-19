@@ -248,7 +248,7 @@ Roll-up de todos os cenários para acompanhamento (teste → VC). A versão filt
 **Total: 22 cenários** — 4 happy, 10 edge, 8 robustez. Todos os VCs com ≥ 2 cenários; todos os dados de teste são do domínio de logística da NovaTech.
 ---
 
-## 3. Prompt de geração (criar o artefato)
+## 3. Prompt de geração "Claude Cowork" (criar o artefato)
 
 Usado uma vez, com o `test-plan.md` anexado no Cowork.
 
