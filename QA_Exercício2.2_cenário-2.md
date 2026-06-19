@@ -246,3 +246,75 @@ Roll-up de todos os cenários para acompanhamento (teste → VC). A versão filt
 | TC-R-08 | Robustez | Idiomas misturados | Confusão de idioma | VC-03 / VC-02 | Não iniciado |
 
 **Total: 22 cenários** — 4 happy, 10 edge, 8 robustez. Todos os VCs com ≥ 2 cenários; todos os dados de teste são do domínio de logística da NovaTech.
+---
+
+## 3. Prompt de geração (criar o artefato)
+
+Usado uma vez, com o `test-plan.md` anexado no Cowork.
+
+```text
+Você é meu assistente de QA. Anexei o test-plan.md do query endpoint do
+assistente NovaTech. Crie uma planilha Excel (.xlsx) rastreável de execução
+de testes a partir da seção "Matriz de rastreabilidade" e dos cenários
+detalhados do plano.
+
+Aba 1 — "Matriz de Rastreabilidade", uma linha por cenário, com as colunas:
+- ID (ex.: TC-03-02) — identificador único, em negrito
+- VC (VC-01..VC-04 ou "Robustez")
+- Tipo (Happy / Edge / Robustez)
+- Cenário (descrição curta)
+- Pergunta (dado de teste)
+- Chunks esperados
+- Resposta esperada
+- Critério de aprovação
+- Estressa (o VC que o cenário de robustez protege; "—" para os demais)
+- Status
+- Observações
+
+Regras de formatação:
+- A coluna Status deve ter uma lista suspensa com exatamente estes valores:
+  Não iniciado, Em implementação, Implementado, Validado, Bloqueado.
+  Valor inicial de todas as linhas: "Não iniciado".
+- Aplique cor de fundo por status: Não iniciado=cinza, Em implementação=amarelo,
+  Implementado=azul claro, Validado=verde, Bloqueado=vermelho claro.
+- Cabeçalho em negrito com fundo escuro e texto branco; congele a primeira linha;
+  ative filtro nas colunas; fonte Arial; quebra de texto nas células longas.
+- Destaque as linhas de Robustez com um leve sombreado para diferenciá-las.
+
+Aba 2 — "Resumo":
+- Uma tabela "Status x Quantidade" com COUNTIF lendo a coluna Status da aba 1
+  (não escreva números fixos; use fórmula) e um Total com SUM.
+- Uma tabela "VC x Nº de cenários" com COUNTIF lendo a coluna VC.
+
+Carregue os 22 cenários do plano (TC-01-01..TC-04-03 e TC-R-01..TC-R-08).
+Não invente cenários nem dados: use exatamente o que está no test-plan.md.
+Ao final, valide que não há erros de fórmula e me entregue o arquivo para download.
+```
+
+## 4. Prompt de manutenção (manter o artefato vivo)
+
+Usado ao longo do projeto, conforme os testes avançam de status.
+
+```text
+Abra a planilha de rastreabilidade de testes do query endpoint. Atualize a
+coluna Status dos seguintes cenários e nada mais:
+- TC-02-01 → Validado
+- TC-03-01 → Implementado
+- TC-04-02 → Bloqueado (Observações: aguardando definição da mensagem padrão)
+
+Depois, recalcule a aba Resumo e me diga, em uma frase, quantos cenários estão
+em cada status e se algum VC bloqueador (VC-02, VC-03, VC-04) ainda tem cenário
+fora de "Validado".
+```
+
+## 5. Como esta evidência atende à Tarefa 3
+
+| Requisito da Tarefa 3 | Onde é atendido |
+|-----------------------|-----------------|
+| ID único por cenário | Coluna `ID` (TC-01-01 … TC-R-08), 22 cenários |
+| Status | Coluna `Status` com lista suspensa e cor por valor; aba `Resumo` agrega via `COUNTIF` |
+| Link para VC | Coluna `VC` + coluna `Estressa` (liga os cenários de robustez ao VC protegido) |
+| Uso do Claude Cowork | Prompt de geração (criação do artefato) + prompt de manutenção (atualização de status) |
+| Artefato rastreável e vivo | O prompt de manutenção demonstra a atualização contínua de status ao longo do ciclo |
+
+
