@@ -1,10 +1,8 @@
-# dgs-ai-first
-
 # Cenário 2 — Entregáveis do papel de QA
 
 **Trilha de Certificação AI First — DB1 Global Software (DGS)
-
-#### Exercício 2.1 — Contribuição para o AGENTS.md: seção de Testing Standards
+---
+## Exercício 2.1 — Contribuição para o AGENTS.md: seção de Testing Standards
 
 **Contexto:** O Tech Lead pediu que você escreva a seção de padrões de teste do AGENTS.md que todo agente de IA deve seguir ao gerar código de teste.
 
