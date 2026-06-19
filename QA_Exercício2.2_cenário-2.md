@@ -2,9 +2,8 @@
 
 **Trilha de Certificação AI First — DB1 Global Software (DGS)
 
-
-
-#### Exercício 2.2 — Criação de spec de testes no formato SDD
+---
+## Exercício 2.2 — Criação de spec de testes no formato SDD
 
 **Contexto:** No modelo SDD, até o plano de testes deve ser especificado antes de ser implementado. Você precisa escrever a spec de testes para o query endpoint.
 
