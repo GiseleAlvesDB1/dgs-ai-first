@@ -2,8 +2,8 @@
 # Cenário 2 — Entregáveis do papel de QA
 
 **Trilha de Certificação AI First — DB1 Global Software (DGS)
-
-#### Exercício 2.3 — Definição de skill de geração de testes
+---
+## Exercício 2.3 — Definição de skill de geração de testes
 
 **Contexto:** Você precisa criar a skill que define como testes devem ser gerados para este projeto.
 
