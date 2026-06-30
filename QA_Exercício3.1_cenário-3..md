@@ -1,3 +1,8 @@
+# Cenário 3 — Entregáveis do papel de QA
+
+**Trilha de Certificação AI First — DB1 Global Software (DGS)
+---
+## Exercício 3.1 — Revisão crítica das respostas do assistente
 
 
 
