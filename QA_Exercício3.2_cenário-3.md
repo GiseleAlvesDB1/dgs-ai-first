@@ -21,7 +21,7 @@ Foram revisados 3 testes de integração gerados pelo Copilot para o `novatech-a
 
 ---
 
-## 2. Revisão QA (1ª passada — humana)
+## 2. Revisão QA (1ª passada)
 
 ### Teste 1 — assertions vagas (`query endpoint`)
 
@@ -79,7 +79,7 @@ Os três testes usam `jest.fn()`, mas o repositório usa **Vitest** (`vitest.con
 
 ---
 
-## 3. Revisão Claude (2ª passada — independente)
+## 3. Revisão Claude (2ª passada)
 
 Segunda revisão pedida ao Claude (chat). O prompt utilizado está na Seção 6.
 
